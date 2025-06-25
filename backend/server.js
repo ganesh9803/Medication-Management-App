@@ -16,8 +16,9 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use('/api', router);
 
-app.get('/', (req, res) => {
-  res.send('✅ API Working from Vercel');
-});
+// Error handling middleware
+app.get('/',(req,res)=> {
+  res.send("API Working")
+})
 
-export const handler = serverless(app);
+app.listen(port, ()=>console.log('Sever started on PORT : ' + port))
