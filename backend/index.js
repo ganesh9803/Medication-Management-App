@@ -16,6 +16,12 @@ import './jobs/updateMissedAdherence.js';
 app.use('/api', router);
 
 const PORT = process.env.PORT || 5000;
+
+// Error handling middleware
+app.get('/',(req,res)=> {
+  res.send("API Working")
+})
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
