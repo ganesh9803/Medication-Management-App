@@ -1,8 +1,8 @@
 import express from 'express';
 import serverless from 'serverless-http';
-import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 import router from '../src/routes/index.js';
 import '../src/jobs/updateMissedAdherence.js';
 
-app.get('/', (req, res) => res.send('API Working on Vercel'));
 app.use('/api', router);
+app.get('/', (req, res) => res.send('API Working from Vercel'));
 
 export const handler = serverless(app);
