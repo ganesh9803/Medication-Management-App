@@ -1,3 +1,4 @@
+//controllers/patient.controller.js
 import prisma from '../config/prismaClient.js';
 
 // Get Medications with Adherence for a Patient

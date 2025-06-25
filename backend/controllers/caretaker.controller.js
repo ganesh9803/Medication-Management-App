@@ -1,4 +1,4 @@
-// File: /src/controllers/caretaker.controller.js
+//controllers/caretaker.controller.js
 import prisma from '../config/prismaClient.js';
 
 export const getCaretakers = async (req, res) => {
