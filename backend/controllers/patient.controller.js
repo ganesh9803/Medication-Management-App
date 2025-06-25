@@ -131,8 +131,8 @@ export const uploadAdherenceProof = async (req, res) => {
       data: {
         status,
         timeTaken: status === 'complete' ? new Date() : null,
-        photoUrl: proofFile ? `/uploads/${proofFile.filename}` : undefined,
-       },
+        photoUrl: proofFile?.path, // Cloudinary URL
+      },
     });
 
     res.json(updated);
@@ -141,6 +141,7 @@ export const uploadAdherenceProof = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 // Get Adherence Analytics for Patient Dashboard
 export const getAdherenceAnalytics = async (req, res) => {
