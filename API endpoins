@@ -1,0 +1,159 @@
+📲 Patient API Endpoints
+1. 🔐 Login
+POST /api/auth/login
+
+Body:
+{
+  "email": "alice@example.com",
+  "password": "password123"
+}
+
+2. 📝 Signup
+POST /api/auth/signup
+
+Body:
+{
+  "name": "Alice",
+  "email": "alice@example.com",
+  "password": "password123",
+  "role": "PATIENT"
+}
+
+3. Get Own Profile
+GET /api/patient/profile
+
+Headers:
+Authorization: Bearer <token>
+
+4.  Get Medications
+GET /api/patient/medications
+
+Headers:
+Authorization: Bearer <token>
+
+5. Mark Adherence
+PATCH /api/patient/adherence
+
+Headers:
+Authorization: Bearer <token>
+
+Body:
+{
+  "adherenceId": 123,
+  "status": "complete"
+}
+
+
+6. Upload Adherence Proof
+POST /api/patient/adherence/proof
+
+Headers:
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+FormData:
+adherenceId: 123
+status: complete
+proof: (file upload)
+
+7. Get Adherence Analytics
+GET /api/patient/adherence/analytics
+
+Headers:
+Authorization: Bearer <token>
+
+8. Assign Caretaker
+PATCH /api/patient/select-caretaker
+
+Headers:
+Authorization: Bearer <token>
+
+Body:
+{
+  "caretakerId": 1
+}
+
+👨‍⚕️ Caretaker API Endpoints
+1. 🔐 Login
+POST /api/auth/login
+
+Body:
+{
+  "email": "bob@example.com",
+  "password": "password123"
+}
+
+2. Signup
+POST /api/auth/signup
+
+Body:
+{
+  "name": "Bob",
+  "email": "bob@example.com",
+  "password": "password123",
+  "role": "CARETAKER"
+}
+
+3. Get Own Profile
+GET /api/caretaker/profile
+
+Headers:
+Authorization: Bearer <token>
+
+4. Get All Caretakers (for Patient to choose)
+GET /api/caretakers
+
+Headers:
+Authorization: Bearer <token>
+
+5.  Get Assigned Patients
+GET /api/caretaker/patients
+
+Headers:
+Authorization: Bearer <token>
+
+6. Assign Medication to Patient
+POST /api/caretaker/medications
+
+Headers:
+Authorization: Bearer <token>
+
+Body:
+{
+  "patientId": 2,
+  "name": "Paracetamol",
+  "dosage": "500mg",
+  "frequency": "Once daily",
+  "durationDays": 7
+}
+
+7. Update Medication
+PATCH /api/caretaker/medications/update
+
+Headers:
+Authorization: Bearer <token>
+
+Body:
+{
+  "medicationId": 1,
+  "name": "Updated Med",
+  "dosage": "250mg",
+  "frequency": "Twice daily",
+  "durationDays": 10
+}
+
+8.  Delete Medication
+DELETE /api/caretaker/medications/:medicationId
+
+Headers:
+Authorization: Bearer <token>
+
+9. Get Adherence Analytics (for a patient)
+GET /api/caretaker/adherence/analytics?patientId=2
+
+Headers:
+Authorization: Bearer <token>
+
+
+
+

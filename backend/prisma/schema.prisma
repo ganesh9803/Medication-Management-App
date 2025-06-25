@@ -1,0 +1,74 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  PATIENT
+  CARETAKER
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String    @unique
+  password   String
+  role       String 
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  patient    Patient?
+  caretaker  Caretaker?
+}
+
+model Patient {
+  id          Int         @id @default(autoincrement())
+  userId      Int         @unique
+  caretakerId Int?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id])
+  caretaker   Caretaker?   @relation(fields: [caretakerId], references: [id])
+  medications Medication[]
+  adherence   Adherence[]
+}
+
+model Caretaker {
+  id         Int        @id @default(autoincrement())
+  userId     Int        @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  user       User       @relation(fields: [userId], references: [id])
+  patients   Patient[]
+}
+
+model Medication {
+  id           Int         @id @default(autoincrement())
+  name         String
+  dosage       String
+  frequency    String
+  durationDays Int?        // ✅ Newly added field
+  patientId    Int
+  patient      Patient     @relation(fields: [patientId], references: [id])
+  adherence    Adherence[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+
+model Adherence {
+  id           Int        @id @default(autoincrement())
+  date         DateTime
+  timeTaken    DateTime?
+  status       String     @default("pending") // "pending", "complete", "missed"
+  medicationId Int
+  patientId    Int
+  photoUrl     String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  medication   Medication @relation(fields: [medicationId], references: [id])
+  patient      Patient    @relation(fields: [patientId], references: [id])
+}
