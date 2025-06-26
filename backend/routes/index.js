@@ -20,7 +20,7 @@ import {
   getAdherenceAnalytics as getCaretakerAdherenceAnalytics
 } from '../controllers/caretaker.controller.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { upload } from '../middleware/upload.js';
+
 
 const router = express.Router();
 
@@ -32,7 +32,7 @@ router.post('/auth/login', login);
 router.get('/patient/medications', authenticate, authorize('PATIENT'), getMedications);
 router.patch('/patient/adherence', authenticate, authorize('PATIENT'), markAdherence);
 router.patch('/patient/select-caretaker', authenticate, authorize('PATIENT'), assignCaretaker);
-router.post('/patient/adherence/proof', authenticate, authorize('PATIENT'), upload.single('proof'), uploadAdherenceProof);
+router.post('/patient/adherence/proof', authenticate, authorize('PATIENT'), uploadAdherenceProof);
 router.get('/patient/adherence/analytics', authenticate, authorize('PATIENT'), getPatientAdherenceAnalytics);
 router.get('/patient/profile', authenticate, authorize('PATIENT'), getMyPatientProfile);
 

@@ -1,12 +1,19 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import API from '../../services/authAPI';
-import { markAdherenceStatus, fetchPatientAnalytics } from '../../features/patient/patientSlice';
+import {
+  markAdherenceStatus,
+  fetchPatientAnalytics,
+} from '../../features/patient/patientSlice';
 
 export default function TodayMedicationCard() {
   const dispatch = useDispatch();
   const { medications } = useSelector((state) => state.patient);
   const today = new Date().toDateString();
+
+  const [proofFiles, setProofFiles] = useState({});
+  const [previewUrls, setPreviewUrls] = useState({});
+  const [uploadingId, setUploadingId] = useState(null);
 
   const todaysAdherence = medications.flatMap((med) =>
     med.adherence
@@ -18,10 +25,6 @@ export default function TodayMedicationCard() {
         frequency: med.frequency,
       }))
   );
-
-  const [proofFiles, setProofFiles] = useState({});
-  const [previewUrls, setPreviewUrls] = useState({});
-  const [uploadingId, setUploadingId] = useState(null);
 
   const handlePhotoChange = (e, id = 'noMed') => {
     const file = e.target.files[0];
@@ -43,21 +46,47 @@ export default function TodayMedicationCard() {
     });
   };
 
+  // ✅ Updated function: upload directly to Cloudinary
   const handleMarkAsTaken = async (record) => {
-    const formData = new FormData();
-    formData.append('adherenceId', record.id);
-    formData.append('status', 'complete');
-    if (proofFiles[record.id]) {
-      formData.append('proof', proofFiles[record.id]);
+    setUploadingId(record.id);
+
+    let photoUrl = '';
+    const file = proofFiles[record.id];
+
+    if (file) {
+      const cloudinaryForm = new FormData();
+      cloudinaryForm.append('file', file);
+      cloudinaryForm.append(
+        'upload_preset',
+        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+      );
+
+      try {
+        const cloudinaryRes = await fetch(
+          `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/upload`,
+          {
+            method: 'POST',
+            body: cloudinaryForm,
+          }
+        );
+        const data = await cloudinaryRes.json();
+        photoUrl = data.secure_url;
+      } catch (err) {
+        console.error('Cloudinary upload failed:', err);
+      }
     }
 
-    setUploadingId(record.id);
     try {
-      await API.post('/patient/adherence/proof', formData);
+      await API.post('/patient/adherence/proof', {
+        adherenceId: record.id,
+        status: 'complete',
+        photoUrl,
+      });
+
       dispatch(markAdherenceStatus({ adherenceId: record.id, status: 'complete' }));
-      dispatch(fetchPatientAnalytics()); 
+      dispatch(fetchPatientAnalytics());
     } catch (err) {
-      console.error('Upload error:', err);
+      console.error('Backend update failed:', err);
     } finally {
       setUploadingId(null);
     }
@@ -65,11 +94,15 @@ export default function TodayMedicationCard() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-slate-800">📅 Today's Medication</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-slate-800">
+        📅 Today's Medication
+      </h2>
 
       {todaysAdherence.length === 0 ? (
         <div className="text-center text-gray-500">
-          <p className="mb-4 text-base font-medium">No medications assigned for today.</p>
+          <p className="mb-4 text-base font-medium">
+            No medications assigned for today.
+          </p>
 
           <div className="border-2 border-dashed border-gray-300 p-6 rounded-xl">
             <div className="flex justify-center mb-2 text-gray-400">
@@ -91,7 +124,7 @@ export default function TodayMedicationCard() {
             </div>
             <p className="font-semibold text-sm">Add Proof Photo (Optional)</p>
             <p className="text-xs text-gray-500 mb-4">
-              Take a photo of your medication or pill organizer as confirmation
+              Take a photo of your medication or pill organizer
             </p>
 
             <input
@@ -203,7 +236,9 @@ export default function TodayMedicationCard() {
                   </div>
 
                   <div className="mt-4 text-left">
-                    <p className="font-semibold text-lg text-slate-700">Medication: {record.medName}</p>
+                    <p className="font-semibold text-lg text-slate-700">
+                      Medication: {record.medName}
+                    </p>
                     <p className="text-sm text-gray-500">Dosage: {record.dosage}</p>
                     <p className="text-sm text-gray-500">Frequency: {record.frequency}</p>
                   </div>

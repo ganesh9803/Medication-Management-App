@@ -18,10 +18,18 @@ export default function AssignMedicationForm() {
 
   const validate = (field, value) => {
     let msg = '';
-    if (!value.trim()) msg = 'This field is required';
-    if (field === 'durationDays' && (isNaN(value) || value <= 0)) {
+   // For strings: trim check
+  if (typeof value === 'string' && !value.trim()) {
+    msg = 'This field is required';
+  }
+
+  // For durationDays specifically (number or numeric string)
+  if (field === 'durationDays') {
+    const number = Number(value);
+    if (!number || number <= 0 || isNaN(number)) {
       msg = 'Duration must be a positive number';
     }
+  }
     return msg;
   };
 

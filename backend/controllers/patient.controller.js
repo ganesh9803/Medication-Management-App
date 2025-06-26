@@ -106,8 +106,7 @@ export const assignCaretaker = async (req, res) => {
 
 // Upload Adherence Proof Image
 export const uploadAdherenceProof = async (req, res) => {
-  const { adherenceId, status } = req.body;
-  const proofFile = req.file;
+  const { adherenceId, status, photoUrl } = req.body;
 
   try {
     const patient = await prisma.patient.findUnique({
@@ -131,7 +130,7 @@ export const uploadAdherenceProof = async (req, res) => {
       data: {
         status,
         timeTaken: status === 'complete' ? new Date() : null,
-        photoUrl: proofFile?.path, // Cloudinary URL
+        photoUrl: photoUrl || null,
       },
     });
 
@@ -141,6 +140,7 @@ export const uploadAdherenceProof = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 // Get Adherence Analytics for Patient Dashboard
