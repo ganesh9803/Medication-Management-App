@@ -6,19 +6,24 @@ export default function SelectedPatientMedicationHistory() {
   if (!selectedPatient) return null;
 
   const adherence = Array.isArray(selectedPatient.medications)
-  ? selectedPatient.medications.flatMap((med) =>
-      med.adherence.map((entry) => ({
-        ...entry,
-        medName: med.name,
-        dosage: med.dosage,
-        hasProof: Boolean(entry.photoUrl), // ← fix: should match your backend field
-      }))
-    ).sort((a, b) => new Date(b.date) - new Date(a.date))
-  : [];
+    ? selectedPatient.medications
+        .flatMap((med) =>
+          med.adherence.map((entry) => ({
+            ...entry,
+            medName: med.name,
+            dosage: med.dosage,
+            hasProof: Boolean(entry.photoUrl),
+            photoUrl: entry.photoUrl || '',
+          }))
+        )
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+    : [];
 
   return (
     <div className="bg-white p-4 rounded shadow-md mt-6">
-      <h3 className="text-lg font-semibold text-gray-700 mb-4">🧾 Recent Medication Activity</h3>
+      <h3 className="text-lg font-semibold text-gray-700 mb-4">
+        🧾 Recent Medication Activity
+      </h3>
       <div className="space-y-4 max-h-[400px] overflow-y-auto">
         {adherence?.map((record) => {
           const date = new Date(record.date).toLocaleDateString('en-US', {
@@ -26,7 +31,7 @@ export default function SelectedPatientMedicationHistory() {
             month: 'long',
             day: 'numeric',
           });
-          const time = new Date(record.date).toLocaleTimeString('en-US', {
+          const time = new Date(record.timeTaken || record.date).toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
           });
@@ -54,8 +59,21 @@ export default function SelectedPatientMedicationHistory() {
               </div>
 
               <div className="flex items-center gap-3">
-                {record.hasProof && (
-                  <span className="text-xs bg-gray-200 px-2 py-1 rounded">📸 Photo</span>
+                {record.hasProof && record.photoUrl ? (
+                  <a
+                    href={record.photoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    <img
+                      src={record.photoUrl}
+                      alt="Proof"
+                      className="w-12 h-12 object-cover rounded shadow border"
+                    />
+                  </a>
+                ) : (
+                  <span className="text-xs italic text-gray-400">No photo</span>
                 )}
                 <span
                   className={`text-xs font-semibold px-2 py-1 rounded ${
