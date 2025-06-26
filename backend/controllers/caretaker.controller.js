@@ -80,7 +80,7 @@ export const assignMedication = async (req, res) => {
 
 
     const medication = await prisma.medication.create({
-      data: { name, dosage, frequency, patientId },
+      data: { name, dosage, frequency, patientId, durationDays },
     });
 
     const today = new Date();
