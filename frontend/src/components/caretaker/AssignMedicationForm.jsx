@@ -47,7 +47,7 @@ export default function AssignMedicationForm() {
     setErrors(newErrors);
 
     if (Object.values(newErrors).every((e) => !e)) {
-      dispatch(assignMedication({ patientId: selectedPatient.patientId, ...form }));
+      dispatch(assignMedication({ patientId: selectedPatient.patientId, ...form, durationDays: Number(form.durationDays) }));
       setForm({ name: '', dosage: '', frequency: '', durationDays: '' });
     }
   };
