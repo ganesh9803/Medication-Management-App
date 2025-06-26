@@ -5,16 +5,16 @@ export default function SelectedPatientMedicationHistory() {
 
   if (!selectedPatient) return null;
 
-  const adherence = selectedPatient.medications
-    ?.flatMap((med) =>
+  const adherence = Array.isArray(selectedPatient.medications)
+  ? selectedPatient.medications.flatMap((med) =>
       med.adherence.map((entry) => ({
         ...entry,
         medName: med.name,
         dosage: med.dosage,
-        hasProof: Boolean(entry.proofUrl),
+        hasProof: Boolean(entry.photoUrl), // ← fix: should match your backend field
       }))
-    )
-    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Most recent first
+    ).sort((a, b) => new Date(b.date) - new Date(a.date))
+  : [];
 
   return (
     <div className="bg-white p-4 rounded shadow-md mt-6">
